@@ -86,7 +86,7 @@ const questions = [
       "Đường thẳng kéo dài thì không đi qua gốc toạ độ",
       "Đường thẳng cắt trục p tại điểm p = p0",
     ],
-    c: 2,
+    c: 1,
   },
   // Câu 10
   {
@@ -98,7 +98,7 @@ const questions = [
   {
     q: "Ở điều kiện tiêu chuẩn: 1 mol khí ở 0 oC có áp suất 1 atm và thể tích là 22,4 lít. Hỏi một bình có dung tích 5 lít chứa 0,5 mol khí ở nhiệt độ 0 oC có áp suất là bao nhiêu?",
     a: ["1,12 at", "2,24 at", "2,04 at", "2,56 at"],
-    c: 0,
+    c: 1,
   },
   // Câu 12
   {
@@ -110,19 +110,19 @@ const questions = [
   {
     q: "Một khối ban đầu có V1 = 2,4 m3, p1 = 1 kN/m2 biến đổi đẳng nhiệt đến áp suất 0,5 kN/m2 thì thể tích của khối khí bằng:",
     a: ["3,6 m3", "4,8 m3", "3,6 m3", "4,8 m3"],
-    c: 0,
+    c: 1,
   },
   // Câu 14
   {
     q: "Nén một khối khí theo quá trình đẳng nhiệt từ thể tích 10 lít đến thể tích 4 lít thì áp suất của khí tăng lên bao nhiêu lần?",
     a: ["2,5 lần", "1,5 lần", "2 lần", "4 lần"],
-    c: 2,
+    c: 0,
   },
   // Câu 15
   {
     q: "Nén một khối khí theo quá trình đẳng nhiệt từ thể tích 9 lít đến thể tích 6 lít thì áp suất tăng một lượng Δp = 50 kPa. Áp suất ban đầu của khí đó là:",
     a: ["40 kPa", "80 kPa", "60 kPa", "100 kPa"],
-    c: 2,
+    c: 3,
   },
   // Câu 16
   {
@@ -139,7 +139,7 @@ const questions = [
       "1,8.10^5 Pa và 397 J",
       "1,7.10^5 Pa và 380 J",
     ],
-    c: 2,
+    c: 0,
   },
   // Câu 18
   {
@@ -157,19 +157,20 @@ const questions = [
   {
     q: "Một lượng khí ở 0 oC có áp suất là 1,50.10^5 Pa nếu thể tích khí không đổi thì áp suất ở 273 oC là:",
     a: ["10^5 Pa", "3.10^5 Pa", "2.10^5 Pa", "4.10^5 Pa"],
-    c: 2,
+    c: 1,
   },
+  // Câu 21
   {
     q: "Một bình chứa một lượng khí ở nhiệt độ 27 oC và ở áp suất 2.10^5 Pa. Nếu áp suất tăng gấp đôi thì nhiệt độ của khối khí là:",
     a: ["T = 300 K", "T = 13,5 K", "T = 54 K", "T = 600 K"],
-    c: 0,
+    c: 3,
   },
 
   // Câu 22
   {
     q: "Một cái bơm chứa 100 cm3 không khí ở nhiệt độ 27 oC và áp suất 10^5 Pa. Khi không khí bị nén xuống còn 20 cm3 và nhiệt độ tăng lên tới 327 oC thì áp suất của không khí trong bơm là:",
     a: ["7.10^5 Pa", "9.10^5 Pa", "8.10^5 Pa", "10.10^5 Pa"],
-    c: 2,
+    c: 3,
   },
 
   // Câu 23
@@ -190,21 +191,21 @@ const questions = [
   {
     q: "Để bơm đầy một khí cầu đến thể tích 100 m3 có áp suất 0,1 at ở nhiệt độ không đổi người ta dùng các ống khí Hêli có thể tích 50 lít ở áp suất 100 at. Số ống khí Hêli cần để bơm khí cầu bằng:",
     a: ["1", "2", "3", "4"],
-    c: 2,
+    c: 1,
   },
 
   // Câu 26
   {
     q: "Một bọt khí có thể tích 1,5 cm3 được tạo ra từ khoang tàu ngầm đang lặn ở độ sâu 100 m dưới mực nước biển. Hỏi khi bọt khí này nổi lên mặt nước thì sẽ có thể tích bao nhiêu? Giả sử nhiệt độ của bọt khí là không đổi, biết khối lượng riêng của nước biển là 10^3 kg/m3, áp suất khí quyển là p0 = 10^5 Pa và g = 10 m/s2.",
     a: ["15 cm3", "15,5 cm3", "16 cm3", "16,5 cm3"],
-    c: 2,
+    c: 3,
   },
 
   // Câu 27
   {
     q: "Một ống thủy tinh tiết diện đều S, một đầu kín một đầu hở, chứa một cột thủy ngân dài h = 16 cm. Khi đặt ống thẳng đứng, đầu hở ở trên thì chiều dài của cột không khí là l1 = 15 cm, áp suất khí quyển bằng p0 = 76 cmHg. Khi đặt ống thủy tinh nghiêng một góc α = 30° đối với phương thẳng đứng, đầu hở ở trên thì chiều cao của cột không khí trong ống bằng:",
     a: ["14,5 cm", "15,4 cm", "16,0 cm", "22,7 cm"],
-    c: 2,
+    c: 1,
   },
 
   // Câu 28
@@ -218,7 +219,7 @@ const questions = [
   {
     q: "Một bình chứa một lượng khí ở nhiệt độ 27 oC và ở áp suất 2.10^5 Pa. Nếu áp suất tăng gấp đôi thì nhiệt độ của khối khí là:",
     a: ["300 K", "13,5 K", "54 K", "600 K"],
-    c: 0,
+    c: 3,
   },
 
   // Câu 30
@@ -232,28 +233,28 @@ const questions = [
   {
     q: "Có 5 mol khí ôxi được nung nóng để nhiệt độ tăng thêm 10 oC. Nếu quá trình biến đổi là đẳng áp thì nhiệt lượng mà khí nhận được là giá trị nào sau đây:",
     a: ["145,452.000 J", "145,200 J", "165,520 J", "155,452 J"],
-    c: 0,
+    c: 1,
   },
 
   // Câu 32
   {
     q: "Một khối khí lí tưởng xác định có áp suất 1 at được làm tăng áp suất đến 4 at ở nhiệt độ không đổi thì thể tích biến đổi một lượng 3 lít. Thể tích ban đầu của khối khí đó là:",
     a: ["4 lít", "8 lít", "12 lít", "16 lít"],
-    c: 2,
+    c: 0,
   },
 
   // Câu 33
   {
     q: "Một bình kín đựng khí Heli chứa N = 1,505.10^23 nguyên tử khí Heli ở 0 oC và có áp suất trong bình là 1 atm. Thể tích của bình đựng khí là:",
     a: ["5,6 lít", "11,2 lít", "22,4 lít", "28 lít"],
-    c: 2,
+    c: 0,
   },
 
   // Câu 34
   {
     q: "Một bình nạp khí ở nhiệt độ 33 oC dưới áp suất 300 kPa. Tăng nhiệt độ cho bình đến nhiệt độ 37 oC đẳng tích thì độ tăng áp suất của khí trong bình là:",
     a: ["3,92 kPa", "3,24 kPa", "5,64 kPa", "4,32 kPa"],
-    c: 2,
+    c: 0,
   },
 
   // Câu 35
@@ -267,7 +268,7 @@ const questions = [
   {
     q: "Một bình chứa có dung tích 20 lít chứa khí Ôxi ở nhiệt độ 17 °C và áp suất 1,03.10^7 Pa. Khối lượng khí Ôxi trong bình là:",
     a: ["2,735 g", "27,35 g", "273,5 g", "2,735 kg"],
-    c: 2,
+    c: 3,
   },
 
   // Câu 37
