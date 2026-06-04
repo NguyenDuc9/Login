@@ -15,6 +15,11 @@ export const getAllNhanVien = async () => {
   const reponse = await api.get('/nhan-vien');
   return reponse.data;
 };
+
+export const getChiTietNhanVien = async (id: string) => {
+  const reponse = await api.get(`/nhan-vien/thong-tin-nhan-vien/${id}`);
+  return reponse.data;
+};
 export const getNhanVienById = async (id: string) => {
   const reponse = await api.get(`/nhan-vien/${id}`);
   return reponse.data;

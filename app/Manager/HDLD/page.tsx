@@ -2,8 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Search, FileText, Calendar } from 'lucide-react';
-import { Button, Modal, Table, TableRow, TableCell, Input, Card } from '@/components/ui';
-
+import {
+  Button,
+  Modal,
+  Table,
+  TableRow,
+  TableCell,
+  Input,
+  Card,
+} from '@/components/ui';
+// const formatCurrency = (value: string) => {
+//     const num = parseFloat(value) || 0;
+//     return new Intl.NumberFormat('vi-VN', {
+//       style: 'currency',
+//       currency: 'VND',
+//     }).format(num);
+//   };
 import {
   getAllHDLD,
   createHDLD,
@@ -99,8 +113,12 @@ export default function HDLDPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Quản lý hợp đồng lao động</h1>
-          <p className="text-slate-500 mt-1">Danh sách và quản lý hợp đồng lao động</p>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Quản lý hợp đồng lao động
+          </h1>
+          <p className="text-slate-500 mt-1">
+            Danh sách và quản lý hợp đồng lao động
+          </p>
         </div>
         <Button
           variant="primary"
@@ -135,7 +153,16 @@ export default function HDLDPage() {
           </div>
         </div>
 
-        <Table headers={['Mã hợp đồng', 'Mã NV', 'Lương cơ bản', 'Ngày bắt đầu', 'Ngày kết thúc', 'Thao tác']}>
+        <Table
+          headers={[
+            'Mã hợp đồng',
+            'Mã NV',
+            'Lương cơ bản',
+            'Ngày bắt đầu',
+            'Ngày kết thúc',
+            'Thao tác',
+          ]}
+        >
           {filtered.length === 0 ? (
             <tr>
               <td colSpan={6} className="py-12 text-center text-slate-400">
@@ -151,11 +178,15 @@ export default function HDLDPage() {
                     <div className="p-2 rounded-lg bg-indigo-100">
                       <FileText className="w-4 h-4 text-indigo-600" />
                     </div>
-                    <span className="font-medium text-indigo-600">{item.MaHD}</span>
+                    <span className="font-medium text-indigo-600">
+                      {item.MaHD}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell className="font-medium">{item.MaNV}</TableCell>
-                <TableCell className="text-emerald-600 font-medium">{formatCurrency(item.LuongCoBan)}</TableCell>
+                <TableCell className="text-emerald-600 font-medium">
+                  {formatCurrency(item.LuongCoBan)}
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2 text-slate-600">
                     <Calendar className="w-4 h-4" />
@@ -242,7 +273,11 @@ export default function HDLDPage() {
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => setShowForm(false)}
+            >
               Hủy bỏ
             </Button>
             <Button variant="primary" type="submit">

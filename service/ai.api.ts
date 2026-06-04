@@ -7,3 +7,7 @@ export const PostAIRequest = async (data: AIRequest) => {
   const response = await api.post('/ai/chat', data);
   return response.data;
 };
+export const PostAIRequestManager = async (data: AIRequest) => {
+  const response = await api.post('/ManagerAichat/chat', data);
+  return response.data;
+};
