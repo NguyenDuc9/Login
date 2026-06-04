@@ -1,113 +1,43 @@
 'use client';
 
-import {
-  useEffect,
-  useState,
-  FC,
-  ChangeEvent,
-  FormEvent,
-  MouseEvent,
-} from 'react';
-import { Plus, Pencil, X, MessageSquare } from 'lucide-react';
-// Import file CSS của bạn
-import '../../../public/stylesheets/admin.css';
-
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, X, MessageSquare, Search, Calendar, CheckCircle } from 'lucide-react';
+import { Button, Modal, Table, TableRow, TableCell, Input, Card, Badge } from '@/components/ui';
 import {
   getAllNghiPhep,
   createNghiPhep,
-  updateNghiPhep,
   deleteNghiPhep,
   NghiPhep,
   getNghiPhepById,
 } from '@/service/NghiPhep.api';
 
-const TOTAL_DAYS: number = 12;
-
-interface StatusColorConfig {
-  color: string;
-  fontWeight: string;
-}
+const TOTAL_DAYS = 12;
 
 interface UserData {
   MaNV: string;
   [key: string]: any;
 }
 
-interface FormState extends NghiPhep {
-  MaNghiPhep: number;
-  MaNV: string;
-  NgayBatDau: string;
-  NgayKetThuc: string;
-  LyDo: string;
-  TrangThai: 'Dang cho duyet' | 'Da duyet' | 'Tu choi';
-  NgayTao: string;
-  LyDoTuChoi?: string;
-}
-
-type TrangThaiType = 'Dang cho duyet' | 'Da duyet' | 'Tu choi' | 'All';
-
-const getStatusStyle = (status: string): StatusColorConfig => {
-  switch (status) {
-    case 'Dang cho duyet':
-      return { color: '#eab308', fontWeight: 'bold' };
-    case 'Da duyet':
-      return { color: '#22c55e', fontWeight: 'bold' };
-    case 'Tu choi':
-      return { color: '#ef4444', fontWeight: 'bold' };
-    default:
-      return { color: '#1e293b', fontWeight: 'normal' };
-  }
-};
-
-const calculateRemainingDays = (
-  data: NghiPhep[],
-  currentUserMaNV: string,
-): number => {
-  const approvedLeaves: NghiPhep[] = data.filter(
-    (item) => item.MaNV === currentUserMaNV && item.TrangThai === 'Da duyet',
-  );
-
-  const usedDays: number = approvedLeaves.reduce(
-    (total: number, leave: NghiPhep) => {
-      const start: Date = new Date(leave.NgayBatDau);
-      const end: Date = new Date(leave.NgayKetThuc);
-      const days: number =
-        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) +
-        1;
-      return total + days;
-    },
-    0,
-  );
-
-  return Math.max(0, TOTAL_DAYS - usedDays);
-};
-
-const NghiPhepPage: FC = () => {
+export default function NghiPhepStaffPage() {
   const [data, setData] = useState<NghiPhep[]>([]);
   const [search, setSearch] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<TrangThaiType>('All');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Dang cho duyet' | 'Da duyet' | 'Tu choi'>('All');
 
-  // State quản lý Form thêm/sửa
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-
-  // State quản lý xem lý do từ chối
   const [showReasonModal, setShowReasonModal] = useState<boolean>(false);
   const [viewReason, setViewReason] = useState<string>('');
-
   const [currentUserMaNV, setCurrentUserMaNV] = useState<string>('');
 
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState({
     MaNghiPhep: 0,
     MaNV: '',
     NgayBatDau: '',
     NgayKetThuc: '',
     LyDo: '',
-    TrangThai: 'Dang cho duyet',
+    TrangThai: 'Dang cho duyet' as const,
     NgayTao: '',
   });
 
-  // Load data
   const loadData = async (): Promise<void> => {
     const user: UserData = JSON.parse(localStorage.getItem('user') || '{}');
     const maNV: string = user.MaNV || '';
@@ -125,9 +55,22 @@ const NghiPhepPage: FC = () => {
     loadData();
   }, []);
 
-  // Input change
+  const calculateRemainingDays = (): number => {
+    const approvedLeaves: NghiPhep[] = data.filter(
+      (item) => item.TrangThai === 'Da duyet',
+    );
+    const usedDays: number = approvedLeaves.reduce((total: number, leave: NghiPhep) => {
+      const start: Date = new Date(leave.NgayBatDau);
+      const end: Date = new Date(leave.NgayKetThuc);
+      const days: number =
+        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      return total + days;
+    }, 0);
+    return Math.max(0, TOTAL_DAYS - usedDays);
+  };
+
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
@@ -136,8 +79,7 @@ const NghiPhepPage: FC = () => {
     }));
   };
 
-  // Submit form
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     if (!form.NgayBatDau || !form.NgayKetThuc) {
@@ -151,21 +93,13 @@ const NghiPhepPage: FC = () => {
     }
 
     try {
-      if (isEdit) {
-        await updateNghiPhep(form.MaNghiPhep, form);
-      } else {
-        const user: UserData = JSON.parse(localStorage.getItem('user') || '{}');
-        const maNV: string = user.MaNV || '';
-        const newData: Partial<NghiPhep> = {
-          ...form,
-          MaNV: maNV,
-        };
-        await createNghiPhep(newData as NghiPhep);
-      }
+      const newData: Partial<NghiPhep> = {
+        ...form,
+        MaNV: currentUserMaNV,
+      };
+      await createNghiPhep(newData as NghiPhep);
 
       setShowForm(false);
-      setIsEdit(false);
-
       setForm({
         MaNghiPhep: 0,
         MaNV: '',
@@ -183,14 +117,6 @@ const NghiPhepPage: FC = () => {
     }
   };
 
-  // Edit
-  const handleEdit = (nv: NghiPhep): void => {
-    setForm(nv as FormState);
-    setIsEdit(true);
-    setShowForm(true);
-  };
-
-  // Cancel leave request
   const handleCancel = async (id: number): Promise<void> => {
     if (confirm('Bạn có chắc muốn hủy yêu cầu nghỉ phép này?')) {
       try {
@@ -203,367 +129,179 @@ const NghiPhepPage: FC = () => {
     }
   };
 
-  // Xem lý do từ chối
   const handleViewReason = (reason?: string): void => {
     setViewReason(reason || 'Không có lý do cụ thể được cung cấp.');
     setShowReasonModal(true);
   };
 
-  // Search and filter
   const filtered: NghiPhep[] = data.filter((nv) => {
     const matchesSearch: boolean =
       nv.MaNghiPhep?.toString().includes(search) ||
-      nv.MaNV?.toLowerCase().includes(search.toLowerCase()) ||
       nv.LyDo?.toLowerCase().includes(search.toLowerCase());
-
     const matchesStatus: boolean =
       statusFilter === 'All' || nv.TrangThai === statusFilter;
-
     return matchesSearch && matchesStatus;
   });
 
-  const remainingDays: number = calculateRemainingDays(data, currentUserMaNV);
-  const statuses: TrangThaiType[] = [
-    'All',
-    'Dang cho duyet',
-    'Da duyet',
-    'Tu choi',
-  ];
+  const remainingDays = calculateRemainingDays();
+  const statuses = ['All', 'Dang cho duyet', 'Da duyet', 'Tu choi'] as const;
 
-  const handleOpenNewForm = (): void => {
-    setIsEdit(false);
-    setShowForm(true);
-    setForm({
-      MaNghiPhep: 0,
-      MaNV: '',
-      NgayBatDau: '',
-      NgayKetThuc: '',
-      LyDo: '',
-      TrangThai: 'Dang cho duyet',
-      NgayTao: '',
-    });
-  };
-
-  const handleCloseModal = (): void => {
-    setShowForm(false);
-  };
-
-  const handleModalOverlayClick = (e: MouseEvent<HTMLDivElement>): void => {
-    if (e.target === e.currentTarget) {
-      setShowForm(false);
-      setShowReasonModal(false);
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'All': return 'Tất cả';
+      case 'Dang cho duyet': return 'Đang chờ duyệt';
+      case 'Da duyet': return 'Đã duyệt';
+      case 'Tu choi': return 'Từ chối';
+      default: return status;
     }
   };
 
-  const getStatusLabel = (status: TrangThaiType): string => {
+  const getStatusVariant = (status: string): 'warning' | 'success' | 'danger' | 'default' => {
     switch (status) {
-      case 'All':
-        return 'Tất cả';
-      case 'Dang cho duyet':
-        return 'Đang chờ duyệt';
-      case 'Da duyet':
-        return 'Đã duyệt';
-      case 'Tu choi':
-        return 'Từ chối';
-      default:
-        return status;
+      case 'Dang cho duyet': return 'warning';
+      case 'Da duyet': return 'success';
+      case 'Tu choi': return 'danger';
+      default: return 'default';
     }
   };
 
   return (
-    <div className="content">
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-        }}
-      >
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 style={{ margin: 0, color: '#1e293b' }}>Quản lý nghỉ phép</h2>
-          <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>
-            Quản lý và theo dõi các yêu cầu nghỉ phép của bạn
-          </p>
+          <h1 className="text-2xl font-bold text-slate-800">Quản lý nghỉ phép</h1>
+          <p className="text-slate-500 mt-1">Theo dõi yêu cầu nghỉ phép của bạn</p>
         </div>
-        <div
-          style={{
-            background: '#f8fafc',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            border: '1px solid #cbd5e1',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>
-            Số phép còn lại
-          </p>
-          <h3 style={{ margin: 0, color: '#3b82f6' }}>
-            {remainingDays}/{TOTAL_DAYS}
-          </h3>
+        <div className="flex items-center gap-3">
+          <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-5 py-3 text-center">
+            <p className="text-sm text-indigo-600 font-medium">Số phép còn lại</p>
+            <p className="text-2xl font-bold text-indigo-600">{remainingDays}/{TOTAL_DAYS}</p>
+          </div>
+          <Button variant="primary" onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4" />
+            Tạo yêu cầu mới
+          </Button>
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: '20px',
-          alignItems: 'center',
-        }}
-      >
-        <input
-          className="search"
-          placeholder="Tìm kiếm theo mã, nhân viên hoặc lý do..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <button
-          className="btn-add"
-          onClick={handleOpenNewForm}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            margin: 0,
-          }}
-        >
-          <Plus size={16} /> Tạo yêu cầu mới
-        </button>
-      </div>
-
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+      {/* Filter buttons */}
+      <div className="flex gap-2 flex-wrap">
         {statuses.map((status) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            style={{
-              padding: '8px 16px',
-              border: 'none',
-              background: statusFilter === status ? '#3b82f6' : '#f1f5f9',
-              color: statusFilter === status ? 'white' : '#475569',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              statusFilter === status
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
           >
             {getStatusLabel(status)}
           </button>
         ))}
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
+      <Card className="!p-0">
+        <Table headers={['Mã phép', 'Ngày bắt đầu', 'Ngày kết thúc', 'Lý do', 'Trạng thái', 'Thao tác']}>
+          {filtered.length === 0 ? (
             <tr>
-              <th>Mã phép</th>
-              <th>Nhân viên</th>
-              <th>Ngày bắt đầu</th>
-              <th>Ngày kết thúc</th>
-              <th>Lý do</th>
-              <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th style={{ textAlign: 'center' }}>Thao tác</th>
+              <td colSpan={6} className="py-12 text-center text-slate-400">
+                <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p>Không có yêu cầu nào</p>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={8}
-                  style={{ textAlign: 'center', padding: '2rem' }}
-                >
-                  Không có dữ liệu
-                </td>
-              </tr>
-            ) : (
-              filtered.map((nv) => (
-                <tr key={nv.MaNghiPhep}>
-                  <td style={{ fontWeight: 'bold' }}>#{nv.MaNghiPhep}</td>
-                  <td>{nv.MaNV}</td>
-                  <td>{nv.NgayBatDau}</td>
-                  <td>{nv.NgayKetThuc}</td>
-                  <td
-                    style={{
-                      maxWidth: '200px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                    title={nv.LyDo}
-                  >
+          ) : (
+            filtered.map((nv) => (
+              <TableRow key={nv.MaNghiPhep}>
+                <TableCell className="font-bold text-indigo-600">#{nv.MaNghiPhep}</TableCell>
+                <TableCell>{nv.NgayBatDau}</TableCell>
+                <TableCell>{nv.NgayKetThuc}</TableCell>
+                <TableCell>
+                  <span className="truncate max-w-[200px] block text-slate-600" title={nv.LyDo}>
                     {nv.LyDo}
-                  </td>
-                  <td style={getStatusStyle(nv.TrangThai)}>
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStatusVariant(nv.TrangThai)} size="sm">
                     {getStatusLabel(nv.TrangThai)}
-                  </td>
-                  <td>{nv.NgayTao}</td>
-                  <td style={{ textAlign: 'center' }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '5px',
-                      }}
-                    >
-                      {/* Đang chờ duyệt -> Hiện nút Sửa và Hủy */}
-                      {nv.TrangThai === 'Dang cho duyet' ? (
-                        <>
-                          <button
-                            onClick={() => handleEdit(nv)}
-                            style={{
-                              background: '#f59e0b',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              padding: '4px 8px',
-                            }}
-                            title="Chỉnh sửa"
-                          >
-                            <Pencil size={14} />
-                          </button>
-
-                          <button
-                            onClick={() => handleCancel(nv.MaNghiPhep)}
-                            className="btn-close"
-                            style={{ padding: '4px 8px' }}
-                            title="Hủy yêu cầu"
-                          >
-                            <X size={14} />
-                          </button>
-                        </>
-                      ) : nv.TrangThai === 'Tu choi' ? (
-                        /* Bị từ chối -> Hiện nút Xem lý do */
-                        <button
-                          onClick={() =>
-                            handleViewReason((nv as any).LyDoTuChoi)
-                          }
-                          style={{
-                            background: '#64748b',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            padding: '4px 8px',
-                          }}
-                          title="Xem lý do từ chối"
-                        >
-                          <MessageSquare size={14} />
-                        </button>
-                      ) : (
-                        /* Đã duyệt -> Ẩn thao tác */
-                        <span style={{ fontSize: '13px', color: '#94a3b8' }}>
-                          -
-                        </span>
-                      )}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {nv.TrangThai === 'Dang cho duyet' ? (
+                    <div className="flex gap-2">
+                      <Button variant="danger" size="sm" onClick={() => handleCancel(nv.MaNghiPhep)}>
+                        <X className="w-4 h-4" />
+                        Hủy
+                      </Button>
                     </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  ) : nv.TrangThai === 'Tu choi' ? (
+                    <Button variant="secondary" size="sm" onClick={() => handleViewReason((nv as any).LyDoTuChoi)}>
+                      <MessageSquare className="w-4 h-4" />
+                      Lý do
+                    </Button>
+                  ) : (
+                    <span className="text-slate-400 text-sm">-</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </Table>
+      </Card>
 
-      {/* Form Modal (Tạo / Sửa) */}
-      {showForm && (
-        <div className="modal-overlay" onClick={handleModalOverlayClick}>
-          <form
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={handleSubmit}
-            className="modal"
-          >
-            <h2>
-              {isEdit ? 'Chỉnh sửa yêu cầu nghỉ phép' : 'Tạo yêu cầu nghỉ phép'}
-            </h2>
-
-            <div className="form-group">
-              <label>Ngày bắt đầu</label>
-              <input
-                type="date"
-                name="NgayBatDau"
-                value={form.NgayBatDau}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Ngày kết thúc</label>
-              <input
-                type="date"
-                name="NgayKetThuc"
-                value={form.NgayKetThuc}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Lý do</label>
-              <input
-                type="text"
-                name="LyDo"
-                value={form.LyDo}
-                onChange={handleChange}
-                placeholder="Nhập lý do nghỉ phép..."
-                required
-              />
-            </div>
-
-            <div className="modal-actions">
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="btn-close"
-              >
-                Hủy
-              </button>
-              <button type="submit" className="btn-add" style={{ margin: 0 }}>
-                {isEdit ? 'Cập nhật' : 'Tạo'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Reason Modal (Xem lý do từ chối) */}
-      {showReasonModal && (
-        <div className="modal-overlay" onClick={handleModalOverlayClick}>
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: '400px' }}
-          >
-            <h3 style={{ marginTop: 0, color: '#1e293b' }}>Lý do từ chối</h3>
-            <div
-              style={{
-                background: '#fef2f2',
-                border: '1px solid #fca5a5',
-                padding: '12px',
-                borderRadius: '6px',
-                color: '#991b1b',
-                marginTop: '15px',
-                lineHeight: '1.5',
-              }}
-            >
-              {viewReason}
-            </div>
-            <div className="modal-actions" style={{ marginTop: '20px' }}>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setShowReasonModal(false)}
-              >
-                Đóng
-              </button>
-            </div>
+      {/* Form Modal */}
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="Tạo yêu cầu nghỉ phép" size="md">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Input
+            label="Ngày bắt đầu"
+            name="NgayBatDau"
+            type="date"
+            value={form.NgayBatDau}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            label="Ngày kết thúc"
+            name="NgayKetThuc"
+            type="date"
+            value={form.NgayKetThuc}
+            onChange={handleChange}
+            required
+          />
+          <div>
+            <label className="text-sm font-medium text-slate-700 block mb-2">Lý do</label>
+            <textarea
+              name="LyDo"
+              value={form.LyDo}
+              onChange={handleChange}
+              placeholder="Nhập lý do nghỉ phép..."
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              rows={4}
+              required
+            />
           </div>
+          <div className="flex gap-3 pt-4 border-t border-slate-200">
+            <Button variant="secondary" type="button" onClick={() => setShowForm(false)} className="flex-1">
+              Hủy
+            </Button>
+            <Button variant="primary" type="submit" className="flex-1">
+              Tạo yêu cầu
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Reason Modal */}
+      <Modal isOpen={showReasonModal} onClose={() => setShowReasonModal(false)} title="Lý do từ chối" size="sm">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+          {viewReason}
         </div>
-      )}
+        <div className="flex justify-end pt-4 border-t border-slate-200">
+          <Button variant="secondary" onClick={() => setShowReasonModal(false)}>
+            Đóng
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
-};
-
-export default NghiPhepPage;
+}

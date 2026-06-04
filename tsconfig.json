@@ -30,7 +30,8 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "app/admin/taikhoan",
-    "app/Manager/BangLuong/page.tsx"
+    "app/Manager/BangLuong/page.tsx",
+    "app/admin/chat/page.tsx"
   ],
   "exclude": ["node_modules"]
 }

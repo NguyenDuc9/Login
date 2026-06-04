@@ -19,7 +19,10 @@ export const getNhanVienById = async (id: string) => {
   const reponse = await api.get(`/nhan-vien/${id}`);
   return reponse.data;
 };
-
+export const getNhanVienByPhongBan = async (id: string) => {
+  const reponse = await api.get(`/nhan-vien/phong-ban/${id}`);
+  return reponse.data;
+};
 export const createNhanVien = async (data: NhanVien) => {
   const reponse = await api.post('/nhan-vien', data);
   return reponse.data;
